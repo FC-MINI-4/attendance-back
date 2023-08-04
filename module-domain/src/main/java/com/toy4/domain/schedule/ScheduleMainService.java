@@ -1,8 +1,8 @@
 package com.toy4.domain.schedule;
 
-import com.toy4.domain.dayOffHistory.dto.DayOffHistoryResponse;
+import com.toy4.domain.dayOffHistory.dto.FindDayOffHistoryResponse;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
-import com.toy4.domain.dutyHistory.dto.DutyHistoryResponse;
+import com.toy4.domain.dutyHistory.dto.FindDutyHistoryResponse;
 import com.toy4.domain.dutyHistory.repository.DutyHistoryRepository;
 import com.toy4.domain.employee.domain.Employee;
 import com.toy4.domain.employee.exception.EmployeeException;
@@ -27,13 +27,13 @@ public class ScheduleMainService {
     public ScheduleResponse getSchedules(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeException(ErrorCode.EMPLOYEE_NOT_FOUND));
-        List<DayOffHistoryResponse> dayOffHistories =
+        List<FindDayOffHistoryResponse> dayOffHistories =
                 dayOffHistoryRepository.findByEmployeeId(employeeId).stream()
-                        .map(DayOffHistoryResponse::from)
+                        .map(FindDayOffHistoryResponse::from)
                         .collect(Collectors.toList());
-        List<DutyHistoryResponse> duties =
+        List<FindDutyHistoryResponse> duties =
                 dutyHistoryRepository.findByEmployeeId(employeeId).stream()
-                        .map(DutyHistoryResponse::from)
+                        .map(FindDutyHistoryResponse::from)
                         .collect(Collectors.toList());
 
         return ScheduleResponse.builder()
