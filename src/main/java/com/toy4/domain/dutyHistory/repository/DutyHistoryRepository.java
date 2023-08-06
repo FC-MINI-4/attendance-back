@@ -13,11 +13,8 @@ import java.util.Optional;
 
 @Repository
 public interface DutyHistoryRepository extends JpaRepository<DutyHistory, Long> {
+
     List<DutyHistory> findByEmployeeId(Long employeeId);
-    @Query("SELECT s FROM DutyHistory s " +
-            "WHERE s.employee.id = :employeeId " +
-            "AND s.date BETWEEN :startDate AND :endDate")
-    List<DutyHistory> findByEmployeeIdAndDateRange(Long employeeId, LocalDate startDate, LocalDate endDate);
 
     @Query("SELECT s FROM DutyHistory s " +
         "WHERE s.employee.id = :employeeId " +
@@ -25,6 +22,7 @@ public interface DutyHistoryRepository extends JpaRepository<DutyHistory, Long> 
     List<DutyHistory> findByEmployeeIdAndStatus(Long employeeId, RequestStatus status);
 
     List<DutyHistory> findAll();
+
     Optional<DutyHistory> findById(Long id);
 
     @Query("SELECT s FROM DutyHistory s " +
