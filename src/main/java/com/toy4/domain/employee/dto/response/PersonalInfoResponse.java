@@ -12,6 +12,7 @@ import lombok.Getter;
 
 	private Long employeeId;
 	private String department;
+	private String position;
 	private String name;
 	private String email;
 	private String phone;
@@ -22,6 +23,7 @@ import lombok.Getter;
 		return PersonalInfoResponse.builder()
 			.employeeId(employee.getId())
 			.department(employee.getDepartment().getType().getDescription())
+			.position(employee.getPosition().getType().getDescription())
 			.name(employee.getName())
 			.email(employee.getEmail())
 			.phone(employee.getPhone())
