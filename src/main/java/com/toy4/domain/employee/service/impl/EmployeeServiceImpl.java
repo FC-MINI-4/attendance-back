@@ -83,11 +83,15 @@ public class EmployeeServiceImpl implements EmployeeService {
             .orElseThrow(() -> new EmployeeException(ErrorCode.ENTITY_NOT_FOUND));
 
         String profileImagePath = employeeProfileImageService.getDefaultFile();
+        String employeeImagePath = employee.getProfileImagePath();
+
+        if (employeeImagePath != null) {
+            employeeProfileImageService.removeIfFileExists(employee.getProfileImagePath());
+        }
 
         if (!profileImageFile.isEmpty()) {
             profileImagePath = employeeProfileImageService.saveFile(profileImageFile);
         }
-        employeeProfileImageService.removeIfFileExists(employee.getProfileImagePath());
 
         Department department = getDepartmentByType(employeeDto.getDepartmentType());
         employeeDto.addDepartment(department);
