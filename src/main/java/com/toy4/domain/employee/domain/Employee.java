@@ -110,6 +110,8 @@ public class Employee extends BaseEntity {
         this.position = employeeDto.getPosition();
         this.profileImagePath= profileImagePath;
         this.phone = employeeDto.getPhone();
+        this.name = employeeDto.getName();
+        this.hireDate = employeeDto.getHireDate();
     }
 
     public void updateDayOffRemains(float remainingDaysOff) {
