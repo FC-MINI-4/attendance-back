@@ -1,11 +1,10 @@
 package com.toy4.domain.dayOffHistory.service;
 
 import com.toy4.domain.dayOffHistory.domain.DayOffHistory;
-import com.toy4.domain.dayOffHistory.dto.DayOffCancellationRequest;
 import com.toy4.domain.dayOffHistory.dto.DayOffHistoryMainDto;
+import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
 import com.toy4.domain.dayoff.domain.DayOff;
-import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.dayoff.repository.DayOffRepository;
 import com.toy4.domain.dayoff.type.DayOffType;
 import com.toy4.domain.dutyHistory.domain.DutyHistory;
@@ -54,17 +53,13 @@ public class DayOffHistoryMainService {
     }
 
     @Transactional
-    public void cancelDayOffRegistrationRequest(Long dayOffHistoryId, DayOffCancellationRequest requestBody) {
-        if (!requestBody.getStatus().equals(RequestStatus.CANCELLED.getDescription())) {
-            throw new DayOffHistoryException(ErrorCode.INVALID_SCHEDULE_REQUEST_STATUS);
-        }
-
+    public void cancelDayOffRegistrationRequest(Long dayOffHistoryId, DayOffHistoryMainDto dto) {
         DayOffHistory dayOffHistory = dayOffHistoryRepository.findById(dayOffHistoryId)
                 .orElseThrow(() -> new DayOffHistoryException(ErrorCode.DAY_OFF_NOT_FOUND));
         if (dayOffHistory.getStatus() != RequestStatus.REQUESTED) {
             throw new DayOffHistoryException(ErrorCode.ALREADY_RESPONDED_SCHEDULE);
         }
-        Employee employee = employeeRepository.findById(requestBody.getEmployeeId())
+        Employee employee = employeeRepository.findById(dto.getEmployeeId())
                 .orElseThrow(() -> new DayOffHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
         if (employee != dayOffHistory.getEmployee()) {
             throw new DayOffHistoryException(ErrorCode.UNMATCHED_SCHEDULE_AND_EMPLOYEE);

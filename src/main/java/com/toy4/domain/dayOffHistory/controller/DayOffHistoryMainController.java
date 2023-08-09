@@ -59,7 +59,7 @@ public class DayOffHistoryMainController {
                     .body(responseService.failure(errorMessage));
         }
 
-        dayOffHistoryMainService.cancelDayOffRegistrationRequest(dayOffHistoryId, requestBody);
+        dayOffHistoryMainService.cancelDayOffRegistrationRequest(dayOffHistoryId, requestBody.toDto());
 
         return ResponseEntity.ok(responseService.success(null, SuccessCode.SUCCESS));
     }
