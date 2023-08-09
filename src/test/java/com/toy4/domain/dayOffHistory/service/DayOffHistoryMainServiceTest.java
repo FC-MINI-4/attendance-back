@@ -1,12 +1,13 @@
 package com.toy4.domain.dayOffHistory.service;
 
 import com.toy4.domain.dayOffHistory.domain.DayOffHistory;
-import com.toy4.domain.dayOffHistory.dto.DayOffHistoryMainDto;
+import com.toy4.domain.dayOffHistory.dto.DayOffRegistration;
+import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
 import com.toy4.domain.dayoff.domain.DayOff;
-import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.dayoff.repository.DayOffRepository;
 import com.toy4.domain.dayoff.type.DayOffType;
+import com.toy4.domain.dutyHistory.repository.DutyHistoryRepository;
 import com.toy4.domain.employee.domain.Employee;
 import com.toy4.domain.employee.repository.EmployeeRepository;
 import com.toy4.global.response.type.ErrorCode;
@@ -43,13 +44,15 @@ class DayOffHistoryMainServiceTest {
     private EmployeeRepository mockEmpRepo;
     @Mock
     private DayOffRepository mockDayOffRepo;
+    @Mock
+    private DutyHistoryRepository mockDutyHistoryRepo;
 
     @Mock
-    private DayOffHistoryMainDto mockDto;
+    private DayOffRegistration mockDto;
 
     @BeforeEach
     void setup() {
-        mockSut = new DayOffHistoryMainService(mockDayOffHistoryRepo, mockEmpRepo, mockDayOffRepo, null);
+        mockSut = new DayOffHistoryMainService(mockDayOffHistoryRepo, mockEmpRepo, mockDayOffRepo, mockDutyHistoryRepo);
     }
 
     @DisplayName("[예외] 종료 날짜가 시작 날짜보다 빠른 경우")

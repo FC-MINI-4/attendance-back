@@ -2,8 +2,8 @@ package com.toy4.domain.dayOffHistory.service;
 
 import com.toy4.domain.dayOffHistory.domain.DayOffHistory;
 import com.toy4.domain.dayOffHistory.dto.DayOffCancellation;
-import com.toy4.domain.dayOffHistory.dto.DayOffHistoryMainDto;
 import com.toy4.domain.dayOffHistory.dto.DayOffModification;
+import com.toy4.domain.dayOffHistory.dto.DayOffRegistration;
 import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
 import com.toy4.domain.dayoff.domain.DayOff;
@@ -31,7 +31,7 @@ public class DayOffHistoryMainService {
     private final DutyHistoryRepository dutyHistoryRepository;
 
     @Transactional
-    public void registerDayOff(DayOffHistoryMainDto dto) {
+    public void registerDayOff(DayOffRegistration dto) {
         // 검증 및 의존성 추출
         float amount = calculateAmount(dto.getStartDate(), dto.getEndDate(), dto.getType());
         Employee employee = findEmployee(dto.getEmployeeId());
@@ -40,13 +40,13 @@ public class DayOffHistoryMainService {
         validateIfOverlappedDayOffOrDutyNotExists(employee, dto.getStartDate(), dto.getEndDate(), dto.getType());
 
         // 연차 이력 테이블에 새로운 레코드 삽입
-        dayOffHistoryRepository.save(newDayOffHistory(dto, amount, employee));
+        dayOffHistoryRepository.save(newDayOffHistory(employee, amount, dto));
 
         // 잔여 연차 수 감소
         employee.updateDayOffRemains(newDayOffRemains);
     }
 
-    private DayOffHistory newDayOffHistory(DayOffHistoryMainDto dto, float amount, Employee employee) {
+    private DayOffHistory newDayOffHistory(Employee employee, float amount, DayOffRegistration dto) {
         DayOff dayOff = dayOffRepository.findByType(dto.getType());
         return DayOffHistory.from(employee, dayOff, amount, dto);
     }
