@@ -48,6 +48,9 @@ public class DayOffHistoryMainService {
         // 연차 이력 테이블에 새로운 레코드 삽입
         DayOffHistory newDayOffHistory = DayOffHistory.from(employee, dayOff, amount, dto);
         dayOffHistoryRepository.save(newDayOffHistory);
+
+        // 잔여 연차 수 감소
+        employee.updateDayOffRemains(newDayOffRemains);
     }
 
     private float calculateAmount(DayOffHistoryMainDto dto) {
