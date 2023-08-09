@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -22,9 +23,9 @@ public class DayOffRegistrationRequest {
     private LocalDate startDate;
     @NotNull
     private LocalDate endDate;
-    @NotNull
+    @NotBlank
     private String type;
-    @NotNull
+    @NotBlank
     private String reason;
 
     public DayOffRegistration toDto() {
