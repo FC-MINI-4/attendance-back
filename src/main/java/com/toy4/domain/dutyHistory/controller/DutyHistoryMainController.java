@@ -1,8 +1,8 @@
 package com.toy4.domain.dutyHistory.controller;
 
-import com.toy4.domain.dutyHistory.dto.DutyCancellationRequest;
-import com.toy4.domain.dutyHistory.dto.DutyRegistrationRequest;
-import com.toy4.domain.dutyHistory.dto.DutyUpdateRequest;
+import com.toy4.domain.dutyHistory.dto.request.DutyCancellationRequest;
+import com.toy4.domain.dutyHistory.dto.request.DutyRegistrationRequest;
+import com.toy4.domain.dutyHistory.dto.request.DutyUpdateRequest;
 import com.toy4.domain.dutyHistory.exception.DutyHistoryException;
 import com.toy4.domain.dutyHistory.service.DutyHistoryMainService;
 import com.toy4.global.response.service.ResponseService;

@@ -1,5 +1,6 @@
-package com.toy4.domain.dutyHistory.dto;
+package com.toy4.domain.dutyHistory.dto.request;
 
+import com.toy4.domain.dutyHistory.dto.DutyHistoryMainDto;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;

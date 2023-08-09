@@ -1,8 +1,8 @@
 package com.toy4.domain.dayOffHistory.controller;
 
-import com.toy4.domain.dayOffHistory.dto.DayOffCancellationRequest;
-import com.toy4.domain.dayOffHistory.dto.DayOffModificationRequest;
-import com.toy4.domain.dayOffHistory.dto.DayOffRegistrationRequest;
+import com.toy4.domain.dayOffHistory.dto.request.DayOffCancellationRequest;
+import com.toy4.domain.dayOffHistory.dto.request.DayOffModificationRequest;
+import com.toy4.domain.dayOffHistory.dto.request.DayOffRegistrationRequest;
 import com.toy4.domain.dayOffHistory.service.DayOffHistoryMainService;
 import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.global.response.service.ResponseService;

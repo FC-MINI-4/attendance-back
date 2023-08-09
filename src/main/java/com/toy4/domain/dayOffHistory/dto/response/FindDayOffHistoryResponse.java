@@ -1,4 +1,4 @@
-package com.toy4.domain.dayOffHistory.dto;
+package com.toy4.domain.dayOffHistory.dto.response;
 
 import com.toy4.domain.dayOffHistory.domain.DayOffHistory;
 import lombok.AllArgsConstructor;
