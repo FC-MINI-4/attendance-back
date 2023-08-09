@@ -1,11 +1,8 @@
 package com.toy4.domain.dutyHistory.service;
 
-import com.toy4.domain.dayOffHistory.domain.DayOffHistory;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
 import com.toy4.domain.dutyHistory.domain.DutyHistory;
-import com.toy4.domain.dutyHistory.dto.DutyCancellationRequest;
-import com.toy4.domain.dutyHistory.dto.DutyRegistrationRequest;
-import com.toy4.domain.dutyHistory.dto.DutyUpdateRequest;
+import com.toy4.domain.dutyHistory.dto.DutyHistoryMainDto;
 import com.toy4.domain.dutyHistory.exception.DutyHistoryException;
 import com.toy4.domain.dutyHistory.repository.DutyHistoryRepository;
 import com.toy4.domain.employee.domain.Employee;
@@ -16,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.time.LocalDate;
 
 @RequiredArgsConstructor
 @Service
@@ -27,64 +24,56 @@ public class DutyHistoryMainService {
     private final DayOffHistoryRepository dayOffHistoryRepository;
 
     @Transactional
-    public void registerDuty(DutyRegistrationRequest requestBody) {
-        Employee employee = employeeRepository.findById(requestBody.getEmployeeId())
-                .orElseThrow(() -> new DutyHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
+    public void registerDuty(DutyHistoryMainDto dto) {
+        Employee employee = getEmployeeAfterValidate(dto.getEmployeeId());
 
-        Optional<DutyHistory> overlappedDutyHistory =
-                dutyHistoryRepository.findOverlappedDate(requestBody.getEmployeeId(), requestBody.getDate());
-        if (overlappedDutyHistory.isPresent())
-            throw new DutyHistoryException(ErrorCode.OVERLAPPED_DUTY_DATE);
-        Optional<DayOffHistory> overlappedDayOffHistory =
-                dayOffHistoryRepository.findOverlappedDate(requestBody.getEmployeeId(), requestBody.getDate());
-        if (overlappedDayOffHistory.isPresent())
-            throw new DutyHistoryException(ErrorCode.OVERLAPPED_DUTY_DATE);
+        validateDate(dto.getEmployeeId(), dto.getDate());
 
-        dutyHistoryRepository.save(DutyHistory.from(employee, requestBody));
+        dutyHistoryRepository.save(DutyHistory.from(employee, dto));
     }
 
     @Transactional
-    public void cancelDutyRegistrationRequest(Long dutyHistoryId, DutyCancellationRequest requestBody) {
-        if (!requestBody.getStatus().equals(RequestStatus.CANCELLED.getDescription())) {
-            throw new DutyHistoryException(ErrorCode.INVALID_SCHEDULE_REQUEST_STATUS);
-        }
-        Employee employee = employeeRepository.findById(requestBody.getEmployeeId())
-                .orElseThrow(() -> new DutyHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
-        DutyHistory dutyHistory = dutyHistoryRepository.findById(dutyHistoryId)
-                .orElseThrow(() -> new DutyHistoryException(ErrorCode.DUTY_NOT_FOUND));
-        if (dutyHistory.getStatus() == RequestStatus.CANCELLED) {
-            throw new DutyHistoryException(ErrorCode.ALREADY_CANCELLED_SCHEDULE);
-        }
-        if (employee != dutyHistory.getEmployee()) {
-            throw new DutyHistoryException(ErrorCode.UNMATCHED_SCHEDULE_AND_EMPLOYEE);
-        }
+    public void cancelDutyRegistrationRequest(Long dutyHistoryId, DutyHistoryMainDto dto) {
+        DutyHistory dutyHistory = getDutyHistoryAfterValidate(dutyHistoryId, dto.getEmployeeId());
+
         dutyHistory.updateStatus(RequestStatus.CANCELLED);
     }
 
     @Transactional
-    public void updateDutyRegistrationRequest(Long dutyHistoryId, DutyUpdateRequest requestBody) {
+    public void updateDutyRegistrationRequest(Long dutyHistoryId, DutyHistoryMainDto dto) {
+        DutyHistory dutyHistory = getDutyHistoryAfterValidate(dutyHistoryId, dto.getEmployeeId());
+
+        validateDate(dto.getEmployeeId(), dto.getDate());
+
+        dutyHistory.updateDate(dto.getDate());
+    }
+
+    private DutyHistory getDutyHistoryAfterValidate(Long dutyHistoryId, Long employeeId) {
         DutyHistory dutyHistory = dutyHistoryRepository.findById(dutyHistoryId)
                 .orElseThrow(() -> new DutyHistoryException(ErrorCode.DUTY_NOT_FOUND));
         if (dutyHistory.getStatus() != RequestStatus.REQUESTED) {
             throw new DutyHistoryException(ErrorCode.ALREADY_RESPONDED_SCHEDULE);
         }
-        Employee employee = employeeRepository.findById(requestBody.getEmployeeId())
-                .orElseThrow(() -> new DutyHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        Employee employee = getEmployeeAfterValidate(employeeId);
         if (employee != dutyHistory.getEmployee()) {
             throw new DutyHistoryException(ErrorCode.UNMATCHED_SCHEDULE_AND_EMPLOYEE);
         }
+        return dutyHistory;
+    }
 
-        Optional<DutyHistory> dutyOverlappedDate =
-                dutyHistoryRepository.findOverlappedDate(requestBody.getEmployeeId(), requestBody.getDate());
-        if (dutyOverlappedDate.isPresent()) {
-            throw new DutyHistoryException(ErrorCode.OVERLAPPED_DUTY_DATE);
-        }
-        Optional<DayOffHistory> overlappedDayOffHistory =
-                dayOffHistoryRepository.findOverlappedDate(requestBody.getEmployeeId(), requestBody.getDate());
-        if (overlappedDayOffHistory.isPresent()) {
-            throw new DutyHistoryException(ErrorCode.OVERLAPPED_DUTY_DATE);
-        }
+    private Employee getEmployeeAfterValidate(Long employeeId) {
+        return employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new DutyHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
+    }
 
-        dutyHistory.updateDate(requestBody.getDate());
+    private void validateDate(Long employeeId, LocalDate date) {
+        dutyHistoryRepository.findOverlappedDate(employeeId, date)
+                .ifPresent(overlappedDutyHistory -> {
+                    throw new DutyHistoryException(ErrorCode.OVERLAPPED_DUTY_DATE);
+                });
+        dayOffHistoryRepository.findOverlappedDate(employeeId, date)
+                .ifPresent(overlappedDayOffHistory -> {
+                    throw new DutyHistoryException(ErrorCode.OVERLAPPED_DUTY_DATE);
+                });
     }
 }
