@@ -4,7 +4,7 @@ import com.toy4.domain.dayOffHistory.domain.DayOffHistory;
 import com.toy4.domain.dayOffHistory.dto.DayOffHistoryMainDto;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
 import com.toy4.domain.dayoff.domain.DayOff;
-import com.toy4.domain.dayoff.exception.DayOffException;
+import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.dayoff.repository.DayOffRepository;
 import com.toy4.domain.dayoff.type.DayOffType;
 import com.toy4.domain.employee.domain.Employee;
@@ -100,7 +100,7 @@ class DayOffHistoryMainServiceTest {
         when(mockDto.getType()).thenReturn(type);
 
         Assertions.assertThatThrownBy(() -> sut.registerDayOff(mockDto))
-                .isInstanceOf(DayOffException.class)
+                .isInstanceOf(DayOffHistoryException.class)
                 .hasFieldOrPropertyWithValue("errorCode", errorCode);
     }
 

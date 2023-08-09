@@ -5,7 +5,7 @@ import com.toy4.domain.dayOffHistory.dto.DayOffCancellationRequest;
 import com.toy4.domain.dayOffHistory.dto.DayOffHistoryMainDto;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
 import com.toy4.domain.dayoff.domain.DayOff;
-import com.toy4.domain.dayoff.exception.DayOffException;
+import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.dayoff.repository.DayOffRepository;
 import com.toy4.domain.dayoff.type.DayOffType;
 import com.toy4.domain.dutyHistory.domain.DutyHistory;
@@ -37,11 +37,11 @@ public class DayOffHistoryMainService {
         float amount = calculateAmount(dto);
 
         Employee employee = employeeRepository.findById(dto.getEmployeeId())
-                .orElseThrow(() -> new DayOffException(ErrorCode.EMPLOYEE_NOT_FOUND));
+                .orElseThrow(() -> new DayOffHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
 
         float newDayOffRemains = employee.getDayOffRemains() - amount;
         if (newDayOffRemains < 0)
-            throw new DayOffException(ErrorCode.DAY_OFF_REMAINS_OVER);
+            throw new DayOffHistoryException(ErrorCode.DAY_OFF_REMAINS_OVER);
 
         DayOff dayOff = dayOffRepository.findByType(dto.getType());
 
@@ -53,6 +53,69 @@ public class DayOffHistoryMainService {
         employee.updateDayOffRemains(newDayOffRemains);
     }
 
+    @Transactional
+    public void cancelDayOffRegistrationRequest(Long dayOffHistoryId, DayOffCancellationRequest requestBody) {
+        if (!requestBody.getStatus().equals(RequestStatus.CANCELLED.getDescription())) {
+            throw new DayOffHistoryException(ErrorCode.INVALID_SCHEDULE_REQUEST_STATUS);
+        }
+
+        DayOffHistory dayOffHistory = dayOffHistoryRepository.findById(dayOffHistoryId)
+                .orElseThrow(() -> new DayOffHistoryException(ErrorCode.DAY_OFF_NOT_FOUND));
+        if (dayOffHistory.getStatus() != RequestStatus.REQUESTED) {
+            throw new DayOffHistoryException(ErrorCode.ALREADY_RESPONDED_SCHEDULE);
+        }
+        Employee employee = employeeRepository.findById(requestBody.getEmployeeId())
+                .orElseThrow(() -> new DayOffHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        if (employee != dayOffHistory.getEmployee()) {
+            throw new DayOffHistoryException(ErrorCode.UNMATCHED_SCHEDULE_AND_EMPLOYEE);
+        }
+
+        dayOffHistory.updateStatus(RequestStatus.CANCELLED);
+    }
+
+    @Transactional
+    public void updateDayOffRegistrationRequest(Long dayOffHistoryId, DayOffHistoryMainDto dto) {
+        DayOffHistory dayOffHistory = dayOffHistoryRepository.findById(dayOffHistoryId)
+                .orElseThrow(() -> new DayOffHistoryException(ErrorCode.DAY_OFF_NOT_FOUND));
+        if (dayOffHistory.getStatus() != RequestStatus.REQUESTED) {
+            throw new DayOffHistoryException(ErrorCode.ALREADY_RESPONDED_SCHEDULE);
+        }
+        Employee employee = employeeRepository.findById(dto.getEmployeeId())
+                .orElseThrow(() -> new DayOffHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
+        if (employee != dayOffHistory.getEmployee()) {
+            throw new DayOffHistoryException(ErrorCode.UNMATCHED_SCHEDULE_AND_EMPLOYEE);
+        }
+
+        float updatedAmount = calculateAmount(dto);
+        float newDayOffRemains = employee.getDayOffRemains() + dayOffHistory.getTotalAmount() - updatedAmount;
+        if (newDayOffRemains < 0) {
+            throw new DayOffHistoryException(ErrorCode.DAY_OFF_REMAINS_OVER);
+        }
+
+        // 1. 반차일 경우 REQUESTED, APPROVED 상태 중에서 같은 날 같은 유형의 반차나 날짜가 겹치는 '연차', '특별 휴가'가 있거나
+        if (dto.getType().isHalfDayOff()) {
+            List<DayOffHistory> overlappedDayOffHistories = dayOffHistoryRepository.findAllOverlappedDate(employee, dto.getType(), dto.getStartDate());
+            if (!overlappedDayOffHistories.isEmpty()) {
+                throw new DayOffHistoryException(ErrorCode.OVERLAPPED_DAY_OFF_DATE);
+            }
+        // 2. 연차일 경우 REQUESTED, APPROVED 상태 중에서 날짜가 겹치는 연차/당직이 있거나
+        } else {
+            List<DayOffHistory> overlappedDayOffHistories = dayOffHistoryRepository.findAllOverlappedDate(employee, dto.getStartDate(), dto.getEndDate());
+            if (!overlappedDayOffHistories.isEmpty()) {
+                throw new DayOffHistoryException(ErrorCode.OVERLAPPED_DAY_OFF_DATE);
+            }
+            List<DutyHistory> overlappedDutyHistories = dutyHistoryRepository.findOverlappedDate(employee, dto.getStartDate(), dto.getEndDate());
+            if (!overlappedDutyHistories.isEmpty()) {
+                throw new DayOffHistoryException(ErrorCode.OVERLAPPED_DAY_OFF_DATE);
+            }
+        }
+
+        employee.updateDayOffRemains(newDayOffRemains);
+
+        DayOff dayOff = dayOffRepository.findByType(dto.getType());
+        dayOffHistory.update(dayOff, updatedAmount, dto);
+    }
+
     private float calculateAmount(DayOffHistoryMainDto dto) {
         LocalDate startDate = dto.getStartDate();
         LocalDate endDate = dto.getEndDate();
@@ -60,74 +123,17 @@ public class DayOffHistoryMainService {
         boolean isHalfDayOff = dto.getType().isHalfDayOff();
 
         if (daysDifference < 0) {
-            throw new DayOffException(ErrorCode.INVERTED_DAY_OFF_RANGE);
+            throw new DayOffHistoryException(ErrorCode.INVERTED_DAY_OFF_RANGE);
         }
 
         if (isHalfDayOff) {
             if (daysDifference != 0) {
-                throw new DayOffException(ErrorCode.RANGED_HALF_DAY_OFF);
+                throw new DayOffHistoryException(ErrorCode.RANGED_HALF_DAY_OFF);
             }
             return 0.5f;
         } else if (dto.getType() == DayOffType.SPECIAL_DAY_OFF) {
             return 0.0f;
         }
         return (float) (daysDifference + 1);
-    }
-
-    @Transactional
-    public void cancelDayOffRegistrationRequest(Long dayOffHistoryId, DayOffCancellationRequest requestBody) {
-        if (!requestBody.getStatus().equals(RequestStatus.CANCELLED.getDescription())) {
-            throw new DayOffException(ErrorCode.INVALID_SCHEDULE_REQUEST_STATUS);
-        }
-        Employee employee = employeeRepository.findById(requestBody.getEmployeeId())
-                .orElseThrow(() -> new DayOffException(ErrorCode.EMPLOYEE_NOT_FOUND));
-        DayOffHistory dayOffHistory = dayOffHistoryRepository.findById(dayOffHistoryId)
-                .orElseThrow(() -> new DayOffException(ErrorCode.DAY_OFF_NOT_FOUND));
-        if (dayOffHistory.getStatus() == RequestStatus.CANCELLED) {
-            throw new DayOffException(ErrorCode.ALREADY_CANCELLED_SCHEDULE);
-        }
-        if (employee != dayOffHistory.getEmployee()) {
-            throw new DayOffException(ErrorCode.UNMATCHED_SCHEDULE_AND_EMPLOYEE);
-        }
-        dayOffHistory.updateStatus(RequestStatus.CANCELLED);
-    }
-
-    @Transactional
-    public void updateDayOffRegistrationRequest(Long dayOffHistoryId, DayOffHistoryMainDto dto) {
-        DayOff dayOff = dayOffRepository.findByType(dto.getType());
-        DayOffHistory dayOffHistory = dayOffHistoryRepository.findById(dayOffHistoryId)
-                .orElseThrow(() -> new DayOffException(ErrorCode.DAY_OFF_NOT_FOUND));
-        if (dayOffHistory.getStatus() != RequestStatus.REQUESTED) {
-            throw new DayOffException(ErrorCode.ALREADY_RESPONDED_SCHEDULE);
-        }
-        Employee employee = employeeRepository.findById(dto.getEmployeeId())
-                .orElseThrow(() -> new DayOffException(ErrorCode.EMPLOYEE_NOT_FOUND));
-        float updatedAmount = calculateAmount(dto);
-        float newDayOffRemains = employee.getDayOffRemains() + dayOffHistory.getTotalAmount() - updatedAmount;
-        if (newDayOffRemains < 0) {
-            throw new DayOffException(ErrorCode.DAY_OFF_REMAINS_OVER);
-        }
-
-        // 1. 반차일 경우 REQUESTED, APPROVED 상태 중에서 같은 날 같은 유형의 반차나 날짜가 겹치는 '연차', '특별 휴가'가 있거나
-        if (dto.getType().isHalfDayOff()) {
-            List<DayOffHistory> overlappedDayOffHistories = dayOffHistoryRepository.findAllOverlappedDate(employee, dto.getType(), dto.getStartDate());
-            if (!overlappedDayOffHistories.isEmpty()) {
-                throw new DayOffException(ErrorCode.OVERLAPPED_DAY_OFF_DATE);
-            }
-        // 2. 연차일 경우 REQUESTED, APPROVED 상태 중에서 날짜가 겹치는 연차/당직이 있거나
-        } else {
-            List<DayOffHistory> overlappedDayOffHistories = dayOffHistoryRepository.findAllOverlappedDate(employee, dto.getStartDate(), dto.getEndDate());
-            if (!overlappedDayOffHistories.isEmpty()) {
-                throw new DayOffException(ErrorCode.OVERLAPPED_DAY_OFF_DATE);
-            }
-            List<DutyHistory> overlappedDutyHistories = dutyHistoryRepository.findOverlappedDate(employee, dto.getStartDate(), dto.getEndDate());
-            if (!overlappedDutyHistories.isEmpty()) {
-                throw new DayOffException(ErrorCode.OVERLAPPED_DAY_OFF_DATE);
-            }
-        }
-
-        employee.updateDayOffRemains(newDayOffRemains);
-
-        dayOffHistory.update(dayOff, updatedAmount, dto);
     }
 }

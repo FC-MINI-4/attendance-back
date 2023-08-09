@@ -4,7 +4,7 @@ import com.toy4.domain.dayOffHistory.dto.DayOffCancellationRequest;
 import com.toy4.domain.dayOffHistory.dto.DayOffModificationRequest;
 import com.toy4.domain.dayOffHistory.dto.DayOffRegistrationRequest;
 import com.toy4.domain.dayOffHistory.service.DayOffHistoryMainService;
-import com.toy4.domain.dayoff.exception.DayOffException;
+import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.global.response.service.ResponseService;
 import com.toy4.global.response.type.ErrorCode;
 import com.toy4.global.response.type.SuccessCode;
@@ -83,7 +83,7 @@ public class DayOffHistoryMainController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<?> handleDayOffException(DayOffException e) {
+    public ResponseEntity<?> handleDayOffException(DayOffHistoryException e) {
         return ResponseEntity.status(e.getHttpStatus())
                 .body(responseService.failure(e.getErrorCode()));
     }

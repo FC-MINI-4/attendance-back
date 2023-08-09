@@ -25,7 +25,7 @@ public class DayOffHistoryRequest {
 	public static DayOffHistoryDto to(DayOffHistoryRequest request) {
 		return DayOffHistoryDto.builder()
 			.id(request.getDayOffId())
-			.status(RequestStatus.getByTypeString(request.getStatus()))
+			.status(RequestStatus.getByDescription(request.getStatus()))
 			.build();
 	}
 }

@@ -14,7 +14,7 @@ import com.toy4.domain.dayOffHistory.dto.DayOffHistoriesResponse;
 import com.toy4.domain.dayOffHistory.dto.DayOffHistoryDto;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
 import com.toy4.domain.dayOffHistory.service.DayOffHistoryService;
-import com.toy4.domain.dayoff.exception.DayOffException;
+import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.employee.domain.Employee;
 import com.toy4.domain.employee.exception.EmployeeException;
 import com.toy4.domain.employee.repository.EmployeeRepository;
@@ -74,7 +74,7 @@ public class DayOffHistoryServiceImpl implements DayOffHistoryService {
 	@Transactional
 	public CommonResponse<?> updateStatusDayOff(DayOffHistoryDto dto) {
 		DayOffHistory dayOffHistory = dayOffHistoryRepository.findById(dto.getId())
-			.orElseThrow(() -> new DayOffException(ErrorCode.ENTITY_NOT_FOUND));
+			.orElseThrow(() -> new DayOffHistoryException(ErrorCode.ENTITY_NOT_FOUND));
 
 		dayOffHistory.updateStatusDayOff(dto);
 		dayOffHistoryRepository.save(dayOffHistory);
