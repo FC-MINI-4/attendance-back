@@ -1,11 +1,11 @@
 package com.toy4.domain.department.type;
 
-import java.util.Arrays;
 import com.toy4.domain.department.exception.DepartmentException;
 import com.toy4.global.response.type.ErrorCode;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
@@ -21,9 +21,9 @@ public enum DepartmentType {
 
   private final String description;
 
-  public static DepartmentType getByTypeString(String type) {
+  public static DepartmentType getByDescription(String description) {
     return Arrays.stream(values())
-        .filter(departmentType -> departmentType.getDescription().equals(type))
+        .filter(departmentType -> departmentType.getDescription().equals(description))
         .findFirst()
         .orElseThrow(() -> new DepartmentException(ErrorCode.INVALID_REQUEST_DEPARTMENT_TYPE));
   }

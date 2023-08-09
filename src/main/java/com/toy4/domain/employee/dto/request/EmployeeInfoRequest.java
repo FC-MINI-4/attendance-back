@@ -1,21 +1,15 @@
 package com.toy4.domain.employee.dto.request;
 
-import java.time.LocalDate;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.toy4.domain.department.type.DepartmentType;
 import com.toy4.domain.employee.dto.EmployeeDto;
 import com.toy4.domain.position.type.PositionType;
+import lombok.*;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
@@ -43,7 +37,7 @@ public class EmployeeInfoRequest {
 	public static EmployeeDto to(EmployeeInfoRequest request) {
 		return EmployeeDto.builder()
 			.id(request.getEmployeeId())
-			.departmentType(DepartmentType.getByTypeString(request.getDepartment()))
+			.departmentType(DepartmentType.getByDescription(request.getDepartment()))
 			.positionType(PositionType.getByTypeString(request.getPosition()))
 			.name(request.getName())
 			.phone(request.getPhone())

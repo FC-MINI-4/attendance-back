@@ -39,7 +39,7 @@ public class PersonalInfoRequest {
 	public static EmployeeDto to(PersonalInfoRequest request) {
 		return EmployeeDto.builder()
 			.id(request.getEmployeeId())
-			.departmentType(DepartmentType.getByTypeString(request.getDepartment()))
+			.departmentType(DepartmentType.getByDescription(request.getDepartment()))
 			.positionType(PositionType.getByTypeString(request.getPosition()))
 			.name(request.getName())
 			.phone(request.getPhone())
