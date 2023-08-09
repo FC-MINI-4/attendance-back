@@ -10,7 +10,7 @@ file:
 
 
 logging.level.org.hibernate:
-  sql: DEBUG
+  SQL: DEBUG
   type.descriptor.sql.BasicBinder: TRACE
 
 spring:
