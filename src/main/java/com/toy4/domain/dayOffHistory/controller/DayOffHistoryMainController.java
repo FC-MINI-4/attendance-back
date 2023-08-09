@@ -6,7 +6,6 @@ import com.toy4.domain.dayOffHistory.dto.request.DayOffRegistrationRequest;
 import com.toy4.domain.dayOffHistory.service.DayOffHistoryMainService;
 import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.global.response.service.ResponseService;
-import com.toy4.global.response.type.ErrorCode;
 import com.toy4.global.response.type.SuccessCode;
 import com.toy4.global.utils.BindingResultHandler;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +33,11 @@ public class DayOffHistoryMainController {
             @Valid @RequestBody DayOffRegistrationRequest requestBody,
             BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasFieldErrors()) {
             log.info("[POST /api/schedules/day-off] errors: {}", bindingResult.getFieldErrors());
+            String errorMessage = bindingResultHandler.getErrorMessageFromBindingResult(bindingResult);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(responseService.failure(ErrorCode.INVALID_REQUEST));
+                    .body(responseService.failure(errorMessage));
         }
 
         dayOffHistoryMainService.registerDayOff(requestBody.toDto());
@@ -83,7 +83,7 @@ public class DayOffHistoryMainController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<?> handleDayOffException(DayOffHistoryException e) {
+    public ResponseEntity<?> handleDayOffHistoryException(DayOffHistoryException e) {
         return ResponseEntity.status(e.getHttpStatus())
                 .body(responseService.failure(e.getErrorCode()));
     }
