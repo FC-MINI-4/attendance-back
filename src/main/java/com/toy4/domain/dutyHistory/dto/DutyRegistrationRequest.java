@@ -2,6 +2,7 @@ package com.toy4.domain.dutyHistory.dto;
 
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -12,6 +13,6 @@ public class DutyRegistrationRequest {
     private Long employeeId;
     @NotNull
     private LocalDate date;
-    @NotNull
+    @NotBlank
     private String reason;
 }
