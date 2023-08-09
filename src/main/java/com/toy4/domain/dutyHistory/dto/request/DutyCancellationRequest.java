@@ -1,6 +1,6 @@
 package com.toy4.domain.dutyHistory.dto.request;
 
-import com.toy4.domain.dutyHistory.dto.DutyHistoryMainDto;
+import com.toy4.domain.dutyHistory.dto.DutyCancellation;
 import com.toy4.domain.schedule.RequestStatus;
 import lombok.Getter;
 
@@ -15,8 +15,8 @@ public class DutyCancellationRequest {
     @NotBlank
     private String status;
 
-    public DutyHistoryMainDto toDto() {
-        return DutyHistoryMainDto.builder()
+    public DutyCancellation toDto() {
+        return DutyCancellation.builder()
                 .employeeId(employeeId)
                 .status(RequestStatus.getByDescription(status))
                 .build();
