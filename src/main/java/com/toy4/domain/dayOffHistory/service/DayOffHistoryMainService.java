@@ -3,6 +3,7 @@ package com.toy4.domain.dayOffHistory.service;
 import com.toy4.domain.dayOffHistory.domain.DayOffHistory;
 import com.toy4.domain.dayOffHistory.dto.DayOffCancellation;
 import com.toy4.domain.dayOffHistory.dto.DayOffHistoryMainDto;
+import com.toy4.domain.dayOffHistory.dto.DayOffModification;
 import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
 import com.toy4.domain.dayoff.domain.DayOff;
@@ -59,7 +60,7 @@ public class DayOffHistoryMainService {
     }
 
     @Transactional
-    public void updateDayOffRegistrationRequest(Long dayOffHistoryId, DayOffHistoryMainDto dto) {
+    public void updateDayOffRegistrationRequest(Long dayOffHistoryId, DayOffModification dto) {
         float updatedAmount = calculateAmount(dto.getStartDate(), dto.getEndDate(), dto.getType());
         DayOffHistory dayOffHistory = findDayOffHistoryAndValidateStatus(dayOffHistoryId);
         Employee employee = findEmployeeAndValidateIfMatched(dto.getEmployeeId(), dayOffHistory);

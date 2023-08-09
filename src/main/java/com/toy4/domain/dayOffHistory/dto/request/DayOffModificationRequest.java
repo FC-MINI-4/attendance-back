@@ -1,6 +1,6 @@
 package com.toy4.domain.dayOffHistory.dto.request;
 
-import com.toy4.domain.dayOffHistory.dto.DayOffHistoryMainDto;
+import com.toy4.domain.dayOffHistory.dto.DayOffModification;
 import com.toy4.domain.dayoff.type.DayOffType;
 import lombok.Getter;
 
@@ -22,8 +22,8 @@ public class DayOffModificationRequest {
     @NotBlank
     private String reason;
 
-    public DayOffHistoryMainDto toDto() {
-        return DayOffHistoryMainDto.builder()
+    public DayOffModification toDto() {
+        return DayOffModification.builder()
                 .employeeId(employeeId)
                 .startDate(startDate)
                 .endDate(endDate)
