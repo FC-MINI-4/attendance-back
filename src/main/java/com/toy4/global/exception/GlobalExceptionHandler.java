@@ -4,6 +4,7 @@ import com.toy4.domain.dayOffByPosition.exception.DayOffByPositionException;
 import com.toy4.domain.department.exception.DepartmentException;
 import com.toy4.domain.employee.exception.EmployeeException;
 import com.toy4.domain.position.exception.PositionException;
+import com.toy4.domain.schedule.ScheduleException;
 import com.toy4.domain.status.exception.StatusException;
 import com.toy4.global.response.dto.CommonResponse;
 import com.toy4.global.response.service.ResponseService;
@@ -52,6 +53,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DayOffByPositionException.class)
     public CommonResponse<?> handleDayOffByPositionException(DayOffByPositionException e) {
+        log.error("{} is occurred. {}", e.getErrorCode(), e.getErrorMessage());
+        return responseService.failure(e.getErrorCode());
+    }
+
+    @ExceptionHandler(ScheduleException.class)
+    public CommonResponse<?> handleScheduleException(ScheduleException e){
         log.error("{} is occurred. {}", e.getErrorCode(), e.getErrorMessage());
         return responseService.failure(e.getErrorCode());
     }
