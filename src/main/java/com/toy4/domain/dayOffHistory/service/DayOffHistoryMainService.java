@@ -1,6 +1,7 @@
 package com.toy4.domain.dayOffHistory.service;
 
 import com.toy4.domain.dayOffHistory.domain.DayOffHistory;
+import com.toy4.domain.dayOffHistory.dto.DayOffCancellation;
 import com.toy4.domain.dayOffHistory.dto.DayOffHistoryMainDto;
 import com.toy4.domain.dayOffHistory.exception.DayOffHistoryException;
 import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
@@ -50,7 +51,7 @@ public class DayOffHistoryMainService {
     }
 
     @Transactional
-    public void cancelDayOffRegistrationRequest(Long dayOffHistoryId, DayOffHistoryMainDto dto) {
+    public void cancelDayOffRegistrationRequest(Long dayOffHistoryId, DayOffCancellation dto) {
         DayOffHistory dayOffHistory = findDayOffHistoryAndValidateStatus(dayOffHistoryId);
         findEmployeeAndValidateIfMatched(dto.getEmployeeId(), dayOffHistory);
 
