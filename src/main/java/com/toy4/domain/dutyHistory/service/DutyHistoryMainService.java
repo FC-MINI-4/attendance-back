@@ -4,6 +4,7 @@ import com.toy4.domain.dayOffHistory.repository.DayOffHistoryRepository;
 import com.toy4.domain.dutyHistory.domain.DutyHistory;
 import com.toy4.domain.dutyHistory.dto.DutyCancellation;
 import com.toy4.domain.dutyHistory.dto.DutyHistoryMainDto;
+import com.toy4.domain.dutyHistory.dto.DutyModification;
 import com.toy4.domain.dutyHistory.exception.DutyHistoryException;
 import com.toy4.domain.dutyHistory.repository.DutyHistoryRepository;
 import com.toy4.domain.employee.domain.Employee;
@@ -41,7 +42,7 @@ public class DutyHistoryMainService {
     }
 
     @Transactional
-    public void updateDutyRegistrationRequest(Long dutyHistoryId, DutyHistoryMainDto dto) {
+    public void updateDutyRegistrationRequest(Long dutyHistoryId, DutyModification dto) {
         DutyHistory dutyHistory = getDutyHistoryAfterValidate(dutyHistoryId, dto.getEmployeeId());
 
         validateDate(dto.getEmployeeId(), dto.getDate());

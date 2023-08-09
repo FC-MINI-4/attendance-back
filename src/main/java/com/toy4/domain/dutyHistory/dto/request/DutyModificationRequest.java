@@ -1,6 +1,6 @@
 package com.toy4.domain.dutyHistory.dto.request;
 
-import com.toy4.domain.dutyHistory.dto.DutyHistoryMainDto;
+import com.toy4.domain.dutyHistory.dto.DutyModification;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
@@ -17,8 +17,8 @@ public class DutyModificationRequest {
     @NotBlank
     private String reason;
 
-    public DutyHistoryMainDto toDto() {
-        return DutyHistoryMainDto.builder()
+    public DutyModification toDto() {
+        return DutyModification.builder()
                 .employeeId(employeeId)
                 .date(date)
                 .reason(reason)
