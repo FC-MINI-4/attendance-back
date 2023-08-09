@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Getter
-public class DutyUpdateRequest {
+public class DutyModificationRequest {
 
     @NotNull
     private Long employeeId;

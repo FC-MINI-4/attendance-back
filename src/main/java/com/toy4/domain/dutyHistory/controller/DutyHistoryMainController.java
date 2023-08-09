@@ -2,7 +2,7 @@ package com.toy4.domain.dutyHistory.controller;
 
 import com.toy4.domain.dutyHistory.dto.request.DutyCancellationRequest;
 import com.toy4.domain.dutyHistory.dto.request.DutyRegistrationRequest;
-import com.toy4.domain.dutyHistory.dto.request.DutyUpdateRequest;
+import com.toy4.domain.dutyHistory.dto.request.DutyModificationRequest;
 import com.toy4.domain.dutyHistory.exception.DutyHistoryException;
 import com.toy4.domain.dutyHistory.service.DutyHistoryMainService;
 import com.toy4.global.response.service.ResponseService;
@@ -67,7 +67,7 @@ public class DutyHistoryMainController {
     @PutMapping("/{dutyId}")
     public ResponseEntity<?> requestDutyUpdate(
             @PathVariable("dutyId") Long dutyHistoryId,
-            @Valid @RequestBody DutyUpdateRequest requestBody,
+            @Valid @RequestBody DutyModificationRequest requestBody,
             BindingResult bindingResult) {
 
         if (bindingResult.hasFieldErrors()) {
