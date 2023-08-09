@@ -40,7 +40,7 @@ public class DutyHistoryMainController {
                     .body(responseService.failure(errorMessage));
         }
 
-        dutyHistoryMainService.registerDuty(requestBody);
+        dutyHistoryMainService.registerDuty(requestBody.toDto());
 
         return ResponseEntity.created(URI.create("/api/schedules"))
                 .body(responseService.success(null, SuccessCode.SUCCESS));
@@ -59,7 +59,7 @@ public class DutyHistoryMainController {
                     .body(responseService.failure(errorMessage));
         }
 
-        dutyHistoryMainService.cancelDutyRegistrationRequest(dutyHistoryId, requestBody);
+        dutyHistoryMainService.cancelDutyRegistrationRequest(dutyHistoryId, requestBody.toDto());
 
         return ResponseEntity.ok(responseService.success(null, SuccessCode.SUCCESS));
     }
@@ -77,7 +77,7 @@ public class DutyHistoryMainController {
                     .body(responseService.failure(errorMessage));
         }
 
-        dutyHistoryMainService.updateDutyRegistrationRequest(dutyHistoryId, requestBody);
+        dutyHistoryMainService.updateDutyRegistrationRequest(dutyHistoryId, requestBody.toDto());
 
         return ResponseEntity.ok(responseService.success());
     }

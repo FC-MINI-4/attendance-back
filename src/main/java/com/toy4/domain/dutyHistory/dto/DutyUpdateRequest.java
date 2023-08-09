@@ -15,4 +15,12 @@ public class DutyUpdateRequest {
     private LocalDate date;
     @NotBlank
     private String reason;
+
+    public DutyHistoryMainDto toDto() {
+        return DutyHistoryMainDto.builder()
+                .employeeId(employeeId)
+                .date(date)
+                .reason(reason)
+                .build();
+    }
 }
