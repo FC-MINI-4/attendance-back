@@ -24,7 +24,7 @@ public class DutyHistoryRequest {
 	public static DutyHistoryDto to(DutyHistoryRequest request) {
 		return DutyHistoryDto.builder()
 			.id(request.getDutyId())
-			.status(RequestStatus.getByTypeString(request.getStatus()))
+			.status(RequestStatus.getByDescription(request.getStatus()))
 			.build();
 	}
 }
