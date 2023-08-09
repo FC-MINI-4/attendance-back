@@ -35,6 +35,7 @@ public class DayOffHistoryMainService {
         Employee employee = findEmployee(dto.getEmployeeId());
         float newDayOffRemains = employee.getDayOffRemains() - amount;
         validateIfNewDayOffRemainsNonNegative(newDayOffRemains);
+        validateIfOverlappedDayOffOrDutyNotExists(employee, dto.getStartDate(), dto.getEndDate(), dto.getType());
 
         // 연차 이력 테이블에 새로운 레코드 삽입
         dayOffHistoryRepository.save(newDayOffHistory(dto, amount, employee));
