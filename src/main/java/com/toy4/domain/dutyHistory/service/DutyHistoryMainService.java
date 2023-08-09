@@ -27,8 +27,7 @@ public class DutyHistoryMainService {
 
     @Transactional
     public void registerDuty(DutyRegistration dto) {
-        Employee employee = getEmployeeAfterValidate(dto.getEmployeeId());
-
+        Employee employee = findEmployee(dto.getEmployeeId());
         validateDate(dto.getEmployeeId(), dto.getDate());
 
         dutyHistoryRepository.save(DutyHistory.from(employee, dto));
@@ -36,34 +35,33 @@ public class DutyHistoryMainService {
 
     @Transactional
     public void cancelDutyRegistrationRequest(Long dutyHistoryId, DutyCancellation dto) {
-        DutyHistory dutyHistory = getDutyHistoryAfterValidate(dutyHistoryId, dto.getEmployeeId());
+        DutyHistory dutyHistory = findDutyHistoryAndValidateStatusAndIfMatchedEmployee(dutyHistoryId, dto.getEmployeeId());
 
         dutyHistory.updateStatus(RequestStatus.CANCELLED);
     }
 
     @Transactional
     public void updateDutyRegistrationRequest(Long dutyHistoryId, DutyModification dto) {
-        DutyHistory dutyHistory = getDutyHistoryAfterValidate(dutyHistoryId, dto.getEmployeeId());
-
+        DutyHistory dutyHistory = findDutyHistoryAndValidateStatusAndIfMatchedEmployee(dutyHistoryId, dto.getEmployeeId());
         validateDate(dto.getEmployeeId(), dto.getDate());
 
         dutyHistory.updateDate(dto.getDate());
     }
 
-    private DutyHistory getDutyHistoryAfterValidate(Long dutyHistoryId, Long employeeId) {
+    private DutyHistory findDutyHistoryAndValidateStatusAndIfMatchedEmployee(Long dutyHistoryId, Long employeeId) {
         DutyHistory dutyHistory = dutyHistoryRepository.findById(dutyHistoryId)
                 .orElseThrow(() -> new DutyHistoryException(ErrorCode.DUTY_NOT_FOUND));
         if (dutyHistory.getStatus() != RequestStatus.REQUESTED) {
             throw new DutyHistoryException(ErrorCode.ALREADY_RESPONDED_SCHEDULE);
         }
-        Employee employee = getEmployeeAfterValidate(employeeId);
+        Employee employee = findEmployee(employeeId);
         if (employee != dutyHistory.getEmployee()) {
             throw new DutyHistoryException(ErrorCode.UNMATCHED_SCHEDULE_AND_EMPLOYEE);
         }
         return dutyHistory;
     }
 
-    private Employee getEmployeeAfterValidate(Long employeeId) {
+    private Employee findEmployee(Long employeeId) {
         return employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new DutyHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
     }
