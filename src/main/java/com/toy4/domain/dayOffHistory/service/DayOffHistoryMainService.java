@@ -58,8 +58,10 @@ public class DayOffHistoryMainService {
 
     @Transactional
     public void cancelDayOffRegistrationRequest(Long dayOffHistoryId, DayOffCancellation dto) {
-        DayOffHistory dayOffHistory = findDayOffHistoryAndValidateStatus(dayOffHistoryId);
+        DayOffHistory dayOffHistory = findDayOffHistory(dayOffHistoryId);
+        validateStatus(dayOffHistory.getStatus());
         Employee employee = dayOffHistory.getEmployee();
+        validateIfMatchedEmployee(employee.getId(), dto.getEmployeeId());
 
         float restoredDayOffRemains = employee.getDayOffRemains() + dayOffHistory.getTotalAmount();
         employee.updateDayOffRemains(restoredDayOffRemains);
@@ -70,8 +72,11 @@ public class DayOffHistoryMainService {
     @Transactional
     public void updateDayOffRegistrationRequest(Long dayOffHistoryId, DayOffModification dto) {
         float updatedAmount = calculateAmount(dto.getStartDate(), dto.getEndDate(), dto.getType());
-        DayOffHistory dayOffHistory = findDayOffHistoryAndValidateStatus(dayOffHistoryId);
+        DayOffHistory dayOffHistory = findDayOffHistory(dayOffHistoryId);
+        validateStatus(dayOffHistory.getStatus());
         Employee employee = dayOffHistory.getEmployee();
+        validateIfMatchedEmployee(employee.getId(), dayOffHistoryId);
+
         float newDayOffRemains = employee.getDayOffRemains() + dayOffHistory.getTotalAmount() - updatedAmount;
         validateIfNewDayOffRemainsNonNegative(newDayOffRemains);
         validateIfOverlappedDayOffOrDutyNotExists(employee, dto.getStartDate(), dto.getEndDate(), dto.getType());
@@ -80,6 +85,48 @@ public class DayOffHistoryMainService {
 
         DayOff dayOff = dayOffRepository.findByType(dto.getType());
         dayOffHistory.update(dayOff, updatedAmount, dto);
+    }
+
+    private float calculateAmount(LocalDate startDate, LocalDate endDate, DayOffType dayOffType) {
+        long daysDifference = ChronoUnit.DAYS.between(startDate, endDate);
+        boolean isHalfDayOff = dayOffType.isHalfDayOff();
+
+        if (daysDifference < 0) {
+            throw new DayOffHistoryException(ErrorCode.INVERTED_DAY_OFF_RANGE);
+        }
+
+        if (isHalfDayOff) {
+            if (daysDifference != 0) {
+                throw new DayOffHistoryException(ErrorCode.RANGED_HALF_DAY_OFF);
+            }
+            return 0.5f;
+        } else if (dayOffType == DayOffType.SPECIAL_DAY_OFF) {
+            return 0.0f;
+        }
+        return (float) (daysDifference + 1);
+    }
+
+    private DayOffHistory findDayOffHistory(Long dayOffHistoryId) {
+        return dayOffHistoryRepository.findById(dayOffHistoryId)
+                .orElseThrow(() -> new DayOffHistoryException(ErrorCode.DAY_OFF_NOT_FOUND));
+    }
+
+    private static void validateStatus(RequestStatus status) {
+        if (status != RequestStatus.REQUESTED) {
+            throw new DayOffHistoryException(ErrorCode.ALREADY_RESPONDED_SCHEDULE);
+        }
+    }
+
+    private static void validateIfMatchedEmployee(Long idOfEmployee, Long employeeIdOfDayOffHistory) {
+        if (!idOfEmployee.equals(employeeIdOfDayOffHistory)) {
+            throw new DayOffHistoryException(ErrorCode.UNMATCHED_SCHEDULE_AND_EMPLOYEE);
+        }
+    }
+
+    private static void validateIfNewDayOffRemainsNonNegative(float newDayOffRemains) {
+        if (newDayOffRemains < 0) {
+            throw new DayOffHistoryException(ErrorCode.DAY_OFF_REMAINS_OVER);
+        }
     }
 
     private void validateIfOverlappedDayOffOrDutyNotExists(Employee employee, LocalDate startDate, LocalDate endDate, DayOffType dayoffType) {
@@ -100,39 +147,5 @@ public class DayOffHistoryMainService {
                 throw new DayOffHistoryException(ErrorCode.OVERLAPPED_DAY_OFF_DATE);
             }
         }
-    }
-
-    private static void validateIfNewDayOffRemainsNonNegative(float newDayOffRemains) {
-        if (newDayOffRemains < 0) {
-            throw new DayOffHistoryException(ErrorCode.DAY_OFF_REMAINS_OVER);
-        }
-    }
-
-    private DayOffHistory findDayOffHistoryAndValidateStatus(Long dayOffHistoryId) {
-        DayOffHistory dayOffHistory = dayOffHistoryRepository.findById(dayOffHistoryId)
-                .orElseThrow(() -> new DayOffHistoryException(ErrorCode.DAY_OFF_NOT_FOUND));
-        if (dayOffHistory.getStatus() != RequestStatus.REQUESTED) {
-            throw new DayOffHistoryException(ErrorCode.ALREADY_RESPONDED_SCHEDULE);
-        }
-        return dayOffHistory;
-    }
-
-    private float calculateAmount(LocalDate startDate, LocalDate endDate, DayOffType dayOffType) {
-        long daysDifference = ChronoUnit.DAYS.between(startDate, endDate);
-        boolean isHalfDayOff = dayOffType.isHalfDayOff();
-
-        if (daysDifference < 0) {
-            throw new DayOffHistoryException(ErrorCode.INVERTED_DAY_OFF_RANGE);
-        }
-
-        if (isHalfDayOff) {
-            if (daysDifference != 0) {
-                throw new DayOffHistoryException(ErrorCode.RANGED_HALF_DAY_OFF);
-            }
-            return 0.5f;
-        } else if (dayOffType == DayOffType.SPECIAL_DAY_OFF) {
-            return 0.0f;
-        }
-        return (float) (daysDifference + 1);
     }
 }
