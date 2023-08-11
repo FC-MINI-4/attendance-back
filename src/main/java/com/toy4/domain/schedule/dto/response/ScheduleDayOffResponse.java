@@ -1,14 +1,15 @@
-package com.toy4.domain.dayOffHistory.dto.response;
+package com.toy4.domain.schedule.dto.response;
 
 import com.toy4.domain.dayOffHistory.domain.DayOffHistory;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@AllArgsConstructor
-public class FindDayOffHistoryResponse {
+public class ScheduleDayOffResponse {
 
     private final Long dayOffId;
     private final String type;
@@ -18,8 +19,8 @@ public class FindDayOffHistoryResponse {
     private final Float amount;
     private final String reason;
 
-    public static FindDayOffHistoryResponse from(DayOffHistory entity) {
-        return FindDayOffHistoryResponse.builder()
+    public static ScheduleDayOffResponse from(DayOffHistory entity) {
+        return ScheduleDayOffResponse.builder()
                 .dayOffId(entity.getId())
                 .type(entity.getDayOff().getType().getDescription())
                 .status(entity.getStatus().getDescription())

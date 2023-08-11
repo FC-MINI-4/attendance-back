@@ -3,7 +3,7 @@ import com.toy4.domain.employee.dto.request.PersonalInfoRequest;
 import com.toy4.domain.employee.exception.EmployeeException;
 import com.toy4.domain.employee.service.EmployeeService;
 import com.toy4.domain.schedule.ScheduleMainService;
-import com.toy4.domain.schedule.ScheduleResponse;
+import com.toy4.domain.schedule.dto.response.ScheduleResponse;
 import com.toy4.global.response.dto.CommonResponse;
 import com.toy4.global.response.service.ResponseService;
 import com.toy4.global.response.type.SuccessCode;

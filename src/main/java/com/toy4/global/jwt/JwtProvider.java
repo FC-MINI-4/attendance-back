@@ -102,7 +102,7 @@ public class JwtProvider {
     /** JWT 토큰 복호화 후 가져오기 */
     public Claims parseClaims(String token) {
         try {
-            return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJwt(token).getBody();
+            return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
 //            throw new RuntimeException("토큰이 만료되었습니다.");
             return e.getClaims();

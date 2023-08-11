@@ -12,8 +12,8 @@ import com.toy4.domain.employee.dto.Signup;
 import com.toy4.domain.employee.dto.ValidateMatchPassword;
 import com.toy4.domain.employee.dto.request.ChangePasswordRequest;
 import com.toy4.domain.employee.dto.request.EmailDuplicateCheckRequest;
-import com.toy4.domain.employee.dto.request.SendPasswordResetEmailRequest;
 import com.toy4.domain.employee.dto.request.ResetPasswordRequest;
+import com.toy4.domain.employee.dto.request.SendPasswordResetEmailRequest;
 import com.toy4.domain.employee.dto.request.SignupRequest;
 import com.toy4.domain.employee.dto.request.ValidateMatchPasswordRequest;
 import com.toy4.domain.employee.dto.response.SignupResponse;
@@ -26,10 +26,10 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,8 +43,8 @@ public class EmployeeAccountController {
     private final EmployeeService employeeService;
     private final ResponseService responseService;
 
-    @GetMapping("/check-email")
-    public ResponseEntity<?> validateEmail(
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmailNotExist(
             @Valid @RequestBody EmailDuplicateCheckRequest request
             , BindingResult bindingResult
     ) {
@@ -58,8 +58,9 @@ public class EmployeeAccountController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/users/{employeeId}/check-password")
-    public ResponseEntity<?> validateMatchPasswordWithDB(
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping("/users/{employeeId}/check-password")
+    public ResponseEntity<?> checkMatchPasswordWithDB(
             @RequestBody ValidateMatchPasswordRequest request
             , @PathVariable String employeeId) {
         employeeService.validateMatchPasswordWithDB(ValidateMatchPassword.fromRequest(request), Long.valueOf(employeeId));
@@ -108,6 +109,7 @@ public class EmployeeAccountController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/users/{employeeId}/password/change")
     public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordRequest request

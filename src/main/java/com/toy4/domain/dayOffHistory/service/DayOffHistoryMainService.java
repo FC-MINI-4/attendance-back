@@ -46,6 +46,11 @@ public class DayOffHistoryMainService {
         employee.updateDayOffRemains(newDayOffRemains);
     }
 
+    private Employee findEmployee(Long employeeId) {
+        return employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new DayOffHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
+    }
+
     private DayOffHistory newDayOffHistory(Employee employee, float amount, DayOffRegistration dto) {
         DayOff dayOff = dayOffRepository.findByType(dto.getType());
         return DayOffHistory.from(employee, dayOff, amount, dto);
@@ -54,7 +59,10 @@ public class DayOffHistoryMainService {
     @Transactional
     public void cancelDayOffRegistrationRequest(Long dayOffHistoryId, DayOffCancellation dto) {
         DayOffHistory dayOffHistory = findDayOffHistoryAndValidateStatus(dayOffHistoryId);
-        findEmployeeAndValidateIfMatched(dto.getEmployeeId(), dayOffHistory);
+        Employee employee = dayOffHistory.getEmployee();
+
+        float restoredDayOffRemains = employee.getDayOffRemains() + dayOffHistory.getTotalAmount();
+        employee.updateDayOffRemains(restoredDayOffRemains);
 
         dayOffHistory.updateStatus(RequestStatus.CANCELLED);
     }
@@ -63,7 +71,7 @@ public class DayOffHistoryMainService {
     public void updateDayOffRegistrationRequest(Long dayOffHistoryId, DayOffModification dto) {
         float updatedAmount = calculateAmount(dto.getStartDate(), dto.getEndDate(), dto.getType());
         DayOffHistory dayOffHistory = findDayOffHistoryAndValidateStatus(dayOffHistoryId);
-        Employee employee = findEmployeeAndValidateIfMatched(dto.getEmployeeId(), dayOffHistory);
+        Employee employee = dayOffHistory.getEmployee();
         float newDayOffRemains = employee.getDayOffRemains() + dayOffHistory.getTotalAmount() - updatedAmount;
         validateIfNewDayOffRemainsNonNegative(newDayOffRemains);
         validateIfOverlappedDayOffOrDutyNotExists(employee, dto.getStartDate(), dto.getEndDate(), dto.getType());
@@ -98,19 +106,6 @@ public class DayOffHistoryMainService {
         if (newDayOffRemains < 0) {
             throw new DayOffHistoryException(ErrorCode.DAY_OFF_REMAINS_OVER);
         }
-    }
-
-    private Employee findEmployeeAndValidateIfMatched(Long employeeId, DayOffHistory dayOffHistory) {
-        Employee employee = findEmployee(employeeId);
-        if (employee != dayOffHistory.getEmployee()) {
-            throw new DayOffHistoryException(ErrorCode.UNMATCHED_SCHEDULE_AND_EMPLOYEE);
-        }
-        return employee;
-    }
-
-    private Employee findEmployee(Long employeeId) {
-        return employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new DayOffHistoryException(ErrorCode.EMPLOYEE_NOT_FOUND));
     }
 
     private DayOffHistory findDayOffHistoryAndValidateStatus(Long dayOffHistoryId) {

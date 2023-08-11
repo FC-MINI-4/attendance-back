@@ -20,17 +20,14 @@ public class BindingResultHandler {
 
     /** bindingResult ErrorMessage 반환 */
     public String getErrorMessageFromBindingResult(BindingResult bindingResult) {
-        String ret = null;
         FieldError fieldError = Objects.requireNonNull(bindingResult.getFieldError());
         for (String code : Objects.requireNonNull(fieldError.getCodes())) {
             try {
-                String msg = ms.getMessage(code, fieldError.getArguments(), Locale.getDefault());
-                log.info("code: {}, message: {}", code, msg);
-                if (ret == null)
-                    ret = msg;
+                return ms.getMessage(code, fieldError.getArguments(), Locale.getDefault());
             } catch (NoSuchMessageException ignored) {
             }
         }
-        return ret;
+        log.error("[{}]에 대하여 적절한 에러 메시지를 찾을 수 없습니다.", fieldError.getField());
+        return null;
     }
 }

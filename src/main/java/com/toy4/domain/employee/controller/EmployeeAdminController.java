@@ -1,14 +1,12 @@
 package com.toy4.domain.employee.controller;
+
 import com.toy4.domain.employee.dto.request.EmployeeInfoRequest;
-import com.toy4.domain.employee.exception.EmployeeException;
 import com.toy4.domain.employee.service.EmployeeService;
 import com.toy4.global.response.dto.CommonResponse;
 import com.toy4.global.response.service.ResponseService;
 import com.toy4.global.response.type.SuccessCode;
 import com.toy4.global.utils.BindingResultHandler;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -51,11 +49,5 @@ public class EmployeeAdminController {
 
 		employeeService.updateEmployeeInfo(employeeInfoRequest.to(), profileImageFile);
 		return ResponseEntity.ok(responseService.success(null, SuccessCode.COMPLETE_PERSONAL_INFO_UPDATE));
-	}
-
-	@ExceptionHandler
-	public ResponseEntity<?> handleEmployeeException(EmployeeException e) {
-		return ResponseEntity.status(e.getHttpStatus())
-			.body(responseService.failure(e.getErrorCode()));
 	}
 }

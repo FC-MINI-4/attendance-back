@@ -1,7 +1,6 @@
 package com.toy4.domain.dutyHistory.domain;
 
 import com.toy4.domain.BaseEntity;
-import com.toy4.domain.dutyHistory.dto.DutyHistoryDto;
 import com.toy4.domain.dutyHistory.dto.DutyRegistration;
 import com.toy4.domain.employee.domain.Employee;
 import com.toy4.domain.schedule.RequestStatus;
@@ -30,10 +29,6 @@ public class DutyHistory extends BaseEntity {
     private LocalDate date;
     @Column(name = "reason", nullable = false)
     private String reason;
-
-    public void updateStatusDuty(DutyHistoryDto dto) {
-        this.status = dto.getStatus();
-    }
 
     public static DutyHistory from(Employee employee, DutyRegistration dto) {
         return builder()

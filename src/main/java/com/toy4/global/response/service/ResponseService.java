@@ -13,6 +13,10 @@ public interface ResponseService {
         return success(null, SuccessCode.SUCCESS);
     }
 
+    default <T> CommonResponse<T> success(T data) {
+        return success(data, SuccessCode.SUCCESS);
+    }
+
     // 단일 데이터가 존재하는 성공 응답
     <T> CommonResponse<T> success(T data, SuccessCode successCode);
 

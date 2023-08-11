@@ -11,6 +11,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum ErrorCode {
 
+    NO_ACCESS(HttpStatus.FORBIDDEN, "접근이 거부되었습니다."),
+
     LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다."),
     LOAD_USER_FAILED(HttpStatus.UNAUTHORIZED, "회원 정보를 불러오는데 실패했습니다."),
 
@@ -49,11 +51,8 @@ public enum ErrorCode {
 
     DAY_OFF_HISTORIES_NOT_FOUND(HttpStatus.BAD_REQUEST, "연차 리스트 내역이 존재하지 않습니다."),
     DUTY_HISTORIES_NOT_FOUND(HttpStatus.BAD_REQUEST, "당직 리스트 내역이 존재하지 않습니다."),
-    EMPLOYEE_APPROVED_DUTY_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 직원의 승인된 당직 내역이 존재하지 않습니다."),
-    EMPLOYEE_APPROVED_DAY_OFF_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 직원의 승인된 연차 내역이 존재하지 않습니다."),
 
     PAST_DATE(HttpStatus.BAD_REQUEST, "이미 지난 날짜의 경우는 신청할 수 없습니다."),
-    NULL_DATE(HttpStatus.BAD_REQUEST, "날짜가 입력되지 않았습니다."),
     OVERLAPPED_DUTY_DATE(HttpStatus.BAD_REQUEST, "이미 존재하는 '요청됨' 또는 '승인됨' 상태의 당직, '연차' 또는 '특별 휴가'와 날짜가 겹칩니다."),
 
     INVALID_SCHEDULE_REQUEST_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 스케쥴 요청 상태입니다."),
@@ -64,7 +63,7 @@ public enum ErrorCode {
 
     DUTY_NOT_FOUND(HttpStatus.BAD_REQUEST, "요청된 id를 가진 당직 정보를 찾을 수 없습니다."),
 
-    OVERLAPPED_DAY_OFF_DATE(HttpStatus.BAD_REQUEST, "이미 존재하는 '요청됨' 또는 '승인됨' 상태의 연차 또는 당직과 날짜가 겹칩니다."),
+    OVERLAPPED_DAY_OFF_DATE(HttpStatus.BAD_REQUEST, "이미 존재하는 '대기중' 또는 '승인됨' 상태의 연차 또는 당직과 날짜가 겹칩니다."),
     ;
 
     private final HttpStatus httpStatus;

@@ -14,6 +14,7 @@ import static com.toy4.global.response.type.ErrorCode.INVALID_REQUEST_POSITION_T
 import static com.toy4.global.response.type.ErrorCode.INVALID_REQUEST_STATUS_TYPE;
 import static com.toy4.global.response.type.ErrorCode.LOAD_USER_FAILED;
 import static com.toy4.global.response.type.ErrorCode.MISMATCH_PASSWORD;
+import static com.toy4.global.response.type.SuccessCode.COMPLETE_PERSONAL_INFO_UPDATE;
 import static com.toy4.global.response.type.SuccessCode.SUCCESS;
 
 import com.toy4.domain.dayOffByPosition.domain.DayOffByPosition;
@@ -26,6 +27,8 @@ import com.toy4.domain.department.repository.DepartmentRepository;
 import com.toy4.domain.department.type.DepartmentType;
 import com.toy4.domain.employee.domain.Employee;
 import com.toy4.domain.employee.dto.ChangePassword;
+import com.toy4.domain.employee.dto.EmployeeDto;
+
 import com.toy4.domain.employee.dto.ResetPassword;
 import com.toy4.domain.employee.dto.Signup;
 import com.toy4.domain.employee.dto.ValidateMatchPassword;
@@ -105,13 +108,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     public CommonResponse<?> getEmployeeInfo(Long id) {
-
         Employee employee = findEmployee(id);
 
         PersonalInfoResponse response = PersonalInfoResponse.from(employee);
         return responseService.success(response, SUCCESS);
     }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -159,14 +160,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return responseService.success(employeeDayOffInfos, SUCCESS);
     }
-
-
-//   @Override
-//   public CommonResponse<?> validateUniqueEmail(String email) {
-//       // 1. 유효성 검사(이메일 중복 확인)
-//       validateEmailDuplication(email);
-//       return responseService.successWithNoContent(AVAILABLE_EMAIL);
-//   }
 
     @Override
     public void validateUniqueEmail(String email) {
@@ -276,7 +269,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         "        감사합니다." +
                         "    </p>" +
                         "    <a style=\"color: #FFF; text-decoration: none; text-align: center;\"" +
-                        "    href=\"http://localhost:8080/auth/change_password?authToken=" + employee.getAuthToken() + "\" target=\"_blank\">" +
+                        "    href=\"https://soonyang.vercel.app/auth/change_password?authToken=" + employee.getAuthToken() + "\" target=\"_blank\">" +
                         "        <p" +
                         "            style=\"display: inline-block; width: 250px; height: 45px; margin: 30px auto; background: #00a7e1; line-height: 45px; vertical-align: middle; font-size: 16px;\">" +
                         "            비밀번호 변경" +
@@ -318,17 +311,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.updatePassword(passwordEncoder.encode(request.getPassword()));
         employeeRepository.save(employee);
     }
-
-//    @Override
-//    public CommonResponse<?> validateMatchPasswordWithDB(EmployeeDto request) {
-//        // 1. 유효성 검사(고유 회원 아이디)
-//        Employee employee = getEmployeeById(request.getId());
-//
-//        // 2. 유효성 검사(비밀번호 일치 여부 확인)
-//        validatePasswordWithDB(request.getCurrentPassword(), employee.getPassword());
-//
-//        return responseService.successWithNoContent(MATCH_PASSWORD);
-//    }
 
     @Override
     public void validateMatchPasswordWithDB(ValidateMatchPassword request, Long EmployeeId) {
@@ -414,3 +396,4 @@ public class EmployeeServiceImpl implements EmployeeService {
             .orElseThrow(() -> new EmployeeException(ErrorCode.EMPLOYEE_NOT_FOUND));
     }
 }
+

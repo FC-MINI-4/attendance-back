@@ -1,4 +1,4 @@
-package com.toy4.domain.dayOffHistory.dto;
+package com.toy4.domain.dayOffHistory.dto.response;
 
 import static com.toy4.global.date.DateFormatter.*;
 
@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class DayOffHistoriesResponse {
+public class EmployeeDayOffResponse {
 	private Long employeeId;
 	private String name;
 	private String department;
@@ -25,9 +25,9 @@ public class DayOffHistoriesResponse {
 	private String reason;
 
 
-	public static DayOffHistoriesResponse from(DayOffHistory dayOffHistory) {
+	public static EmployeeDayOffResponse from(DayOffHistory dayOffHistory) {
 
-		return DayOffHistoriesResponse.builder()
+		return EmployeeDayOffResponse.builder()
 			.employeeId(dayOffHistory.getEmployee().getId())
 			.name(dayOffHistory.getEmployee().getName())
 			.department(dayOffHistory.getEmployee().getDepartment().getType().getDescription())
@@ -40,6 +40,7 @@ public class DayOffHistoriesResponse {
 			.startDate(dayOffHistory.getStartDate().format(formatter))
 			.endDate(dayOffHistory.getEndDate().format(formatter))
 			.totalAmount(dayOffHistory.getTotalAmount())
+			.reason(dayOffHistory.getReason())
 			.build();
 	}
 }

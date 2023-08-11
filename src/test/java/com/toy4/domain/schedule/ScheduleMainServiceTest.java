@@ -7,6 +7,7 @@ import com.toy4.domain.dutyHistory.repository.DutyHistoryRepository;
 import com.toy4.domain.employee.domain.Employee;
 import com.toy4.domain.employee.exception.EmployeeException;
 import com.toy4.domain.employee.repository.EmployeeRepository;
+import com.toy4.domain.schedule.dto.response.ScheduleResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

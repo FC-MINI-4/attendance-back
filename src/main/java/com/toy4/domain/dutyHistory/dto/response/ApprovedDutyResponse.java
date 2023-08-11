@@ -1,4 +1,4 @@
-package com.toy4.domain.dutyHistory.dto;
+package com.toy4.domain.dutyHistory.dto.response;
 
 import static com.toy4.global.date.DateFormatter.*;
 import com.toy4.domain.dutyHistory.domain.DutyHistory;
