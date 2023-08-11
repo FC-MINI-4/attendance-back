@@ -16,8 +16,8 @@ public class EmployeeDayOffInfoResponse {
 	private final String department;
 	private final String position;
 	private final String hireDate;
-	private final int dayOffUsed;
-	private final int dayOffRemains;
+	private final float dayOffUsed;
+	private final float dayOffRemains;
 	private final int dayOffTotal;
 
 	public EmployeeDayOffInfoResponse(Long id, String name, DepartmentType departmentType, PositionType positionType, LocalDate hireDate, float dayOffUsed, float dayOffRemains, float dayOffTotal) {
@@ -26,8 +26,8 @@ public class EmployeeDayOffInfoResponse {
 		this.department = departmentType.getDescription();
 		this.position = positionType.getDescription();
 		this.hireDate = hireDate.format((formatter));
-		this.dayOffUsed = (int)dayOffUsed;
-		this.dayOffRemains = (int)dayOffRemains;
-		this.dayOffTotal = (int)dayOffTotal;
+		this.dayOffUsed = dayOffUsed;
+		this.dayOffRemains = dayOffRemains;
+		this.dayOffTotal = Math.round(dayOffTotal);
 	}
 }
