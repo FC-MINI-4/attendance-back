@@ -9,9 +9,12 @@ file:
       linux: /home/ubuntu/attendance/images/
 
 
-logging.level.org.hibernate:
-  SQL: DEBUG
-  type.descriptor.sql.BasicBinder: TRACE
+logging.level:
+  root: info
+  org.hibernate:
+    SQL: info
+    type.descriptor.sql.BasicBinder: info
+
 
 spring:
   servlet:
@@ -33,11 +36,11 @@ spring:
     username: sa
     password:
 
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
-      data-locations: classpath:data.sql
+#  sql:
+#    init:
+#      mode: always
+#      schema-locations: classpath:schema.sql
+#      data-locations: classpath:data.sql
 
 
   h2:
@@ -87,3 +90,5 @@ spring:
       static-locations: classpath:/static/images/default/
       add-mappings: true
 
+scheduler:
+  cron: "0 0 2 1 1 *"

@@ -145,12 +145,11 @@ CREATE TABLE day_off_history
 CREATE TABLE duty_history
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
-    employee_id BIGINT       NOT NULL,
-    status      VARCHAR(20)  NOT NULL,
-    date        DATE         NOT NULL,
-    reason      VARCHAR(100) NOT NULL,  -- 100자 이내로 사유를 쓸 수 있음
-    created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+    employee_id BIGINT        NOT NULL,
+    status      VARCHAR(20)   NOT NULL,
+    date        DATE          NOT NULL,
+    created_at  TIMESTAMP     NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMP     NOT NULL DEFAULT NOW(),
     FOREIGN KEY (employee_id) REFERENCES employee (id)
 );
 

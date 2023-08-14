@@ -15,6 +15,7 @@ import com.toy4.domain.schedule.ScheduleException;
 import com.toy4.domain.status.exception.StatusException;
 import com.toy4.global.response.dto.CommonResponse;
 import com.toy4.global.response.service.ResponseService;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -84,7 +85,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e){
-        log.error("MethodArgumentNotValidException is occurred.", e);
+        log.error("AccessDeniedException is occurred.", e);
+        return ResponseEntity.status(NO_ACCESS.getHttpStatus()).body(responseService.failure(NO_ACCESS));
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<?> handleSignatureException(SignatureException e){
+        log.error("SignatureException is occurred.", e);
         return ResponseEntity.status(NO_ACCESS.getHttpStatus()).body(responseService.failure(NO_ACCESS));
     }
 

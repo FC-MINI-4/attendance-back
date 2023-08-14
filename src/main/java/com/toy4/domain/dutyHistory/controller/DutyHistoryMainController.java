@@ -1,22 +1,28 @@
 package com.toy4.domain.dutyHistory.controller;
 
 import com.toy4.domain.dutyHistory.dto.request.DutyCancellationRequest;
-import com.toy4.domain.dutyHistory.dto.request.DutyRegistrationRequest;
 import com.toy4.domain.dutyHistory.dto.request.DutyModificationRequest;
+import com.toy4.domain.dutyHistory.dto.request.DutyRegistrationRequest;
 import com.toy4.domain.dutyHistory.exception.DutyHistoryException;
 import com.toy4.domain.dutyHistory.service.DutyHistoryMainService;
 import com.toy4.global.response.service.ResponseService;
 import com.toy4.global.response.type.SuccessCode;
 import com.toy4.global.utils.BindingResultHandler;
+import java.net.URI;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.net.URI;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,6 +35,7 @@ public class DutyHistoryMainController {
     private final BindingResultHandler bindingResultHandler;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> requestDutyRegistration(
             @Valid @RequestBody DutyRegistrationRequest requestBody,
             BindingResult bindingResult) {
@@ -47,6 +54,7 @@ public class DutyHistoryMainController {
     }
 
     @PutMapping("/{dutyId}/status")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> requestDutyCancellation(
             @PathVariable("dutyId") Long dutyHistoryId,
             @Valid @RequestBody DutyCancellationRequest requestBody,
@@ -65,6 +73,7 @@ public class DutyHistoryMainController {
     }
 
     @PutMapping("/{dutyId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> requestDutyUpdate(
             @PathVariable("dutyId") Long dutyHistoryId,
             @Valid @RequestBody DutyModificationRequest requestBody,

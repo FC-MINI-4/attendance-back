@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ public class DayOffHistoryMainController {
     private final BindingResultHandler bindingResultHandler;
 
     @PostMapping("/schedules/day-off")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> requestDayOffRegistration(
             @Valid @RequestBody DayOffRegistrationRequest requestBody,
             BindingResult bindingResult) {
@@ -47,6 +49,7 @@ public class DayOffHistoryMainController {
     }
 
     @PutMapping("/schedules/day-off/{dayOffId}/status")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> requestDayOffCancellation(
             @PathVariable("dayOffId") Long dayOffHistoryId,
             @Valid @RequestBody DayOffCancellationRequest requestBody,
@@ -65,6 +68,7 @@ public class DayOffHistoryMainController {
     }
 
     @PutMapping("/schedules/day-off/{dayOffId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> requestDayOffUpdate(
             @PathVariable("dayOffId") Long dayOffHistoryId,
             @Valid @RequestBody DayOffModificationRequest requestBody,

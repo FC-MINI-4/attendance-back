@@ -42,7 +42,7 @@ public class DutyHistoryServiceImpl implements DutyHistoryService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<EmployeeDutyResponse> getDutyHistories() {
-		List<DutyHistory> dutyHistories = dutyHistoryRepository.findAll();
+		List<DutyHistory> dutyHistories = dutyHistoryRepository.findAllByStatusNot(RequestStatus.CANCELLED);
 
 		return dutyHistories.stream()
 			.map(EmployeeDutyResponse::from)
