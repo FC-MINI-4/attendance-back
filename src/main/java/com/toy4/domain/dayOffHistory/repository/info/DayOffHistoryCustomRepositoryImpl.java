@@ -10,6 +10,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.toy4.domain.dayOffHistory.domain.QDayOffHistory;
 import com.toy4.domain.employee.domain.QEmployee;
 import com.toy4.domain.employee.dto.response.EmployeeDayOffInfoResponse;
+import com.toy4.domain.employee.type.EmployeeRole;
 import com.toy4.domain.schedule.RequestStatus;
 
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class DayOffHistoryCustomRepositoryImpl implements DayOffHistoryCustomRep
 				employee.id.eq(dayOffHistory.employee.id)
 					.and(dayOffHistory.status.in(RequestStatus.REQUESTED, RequestStatus.APPROVED))
 			)
+			.where(employee.role.eq(EmployeeRole.USER))
 			.groupBy(employee.id, employee.name, employee.dayOffRemains)
 			.fetch();
 	}
