@@ -27,15 +27,12 @@ public class DutyHistory extends BaseEntity {
     private RequestStatus status;
     @Column(name = "date", nullable = false)
     private LocalDate date;
-    @Column(name = "reason", nullable = false)
-    private String reason;
 
     public static DutyHistory from(Employee employee, DutyRegistration dto) {
         return builder()
                 .employee(employee)
                 .status(RequestStatus.REQUESTED)
                 .date(dto.getDate())
-                .reason(dto.getReason())
                 .build();
     }
 

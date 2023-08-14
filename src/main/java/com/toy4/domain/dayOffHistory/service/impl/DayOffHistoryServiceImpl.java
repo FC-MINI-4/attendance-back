@@ -44,7 +44,7 @@ public class DayOffHistoryServiceImpl implements DayOffHistoryService {
 	@Transactional(readOnly = true)
 	public List<EmployeeDayOffResponse> getDayOffs() {
 
-		List<DayOffHistory> dayOffHistories = dayOffHistoryRepository.findAll();
+		List<DayOffHistory> dayOffHistories = dayOffHistoryRepository.findAllByStatusNot(RequestStatus.CANCELLED);
 		return dayOffHistories.stream()
 			.map(EmployeeDayOffResponse::from)
 			.collect(Collectors.toList());
@@ -59,7 +59,7 @@ public class DayOffHistoryServiceImpl implements DayOffHistoryService {
 		dayOffHistory.updateStatus(dto.getStatus());
 		dayOffHistoryRepository.save(dayOffHistory);
 
-		if (dayOffHistory.getStatus() == RequestStatus.CANCELLED) {
+		if (dayOffHistory.getStatus() == RequestStatus.REJECTED) {
 
 			float totalAmount = dayOffHistory.getTotalAmount();
 

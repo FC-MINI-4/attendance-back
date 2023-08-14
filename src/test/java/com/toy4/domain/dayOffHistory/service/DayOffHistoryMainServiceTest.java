@@ -11,7 +11,6 @@ import com.toy4.domain.dutyHistory.repository.DutyHistoryRepository;
 import com.toy4.domain.employee.domain.Employee;
 import com.toy4.domain.employee.repository.EmployeeRepository;
 import com.toy4.global.response.type.ErrorCode;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +27,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -102,7 +102,7 @@ class DayOffHistoryMainServiceTest {
     private void assertThrowWithErrorCode(DayOffType type, ErrorCode errorCode) {
         when(mockDto.getType()).thenReturn(type);
 
-        Assertions.assertThatThrownBy(() -> sut.registerDayOff(mockDto))
+        assertThatThrownBy(() -> sut.registerDayOff(mockDto))
                 .isInstanceOf(DayOffHistoryException.class)
                 .hasFieldOrPropertyWithValue("errorCode", errorCode);
     }
@@ -154,5 +154,52 @@ class DayOffHistoryMainServiceTest {
                 });
 
         verify(mockDayOffHistoryRepo, times(2)).save(any(DayOffHistory.class));
+    }
+
+    @DisplayName("시작일이 당일 보다 전날일 경우 신청 불가")
+    @Test
+    void whenPastDate_thenThrowsException() {
+        // given
+        LocalDate startDate = LocalDate.now();
+        for (int i = 0; i < 10; ++i) {
+            startDate = startDate.minusDays(1);
+            when(mockDto.getStartDate()).thenReturn(startDate);
+
+            // when, then
+            assertThrowsWhenPastDate();
+        }
+    }
+
+    private void assertThrowsWhenPastDate() {
+        assertThatThrownBy(() -> sut.registerDayOff(mockDto))
+                .isInstanceOf(DayOffHistoryException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.PAST_DATE);
+    }
+
+    @DisplayName("시작일이 당일 이상인 경우 신청 가능")
+    @Test
+    void whenToday_thenThrowsException() {
+        // given
+        for (DayOffType type : DayOffType.values()) {
+            when(mockDto.getType()).thenReturn(type);
+            LocalDate startDate = LocalDate.now();
+            LocalDate endDate = startDate.minusDays(1);
+            for (int i = 0; i < 10; ++i) {
+                when(mockDto.getStartDate()).thenReturn(startDate);
+                when(mockDto.getEndDate()).thenReturn(endDate);
+
+                // when, then
+                assertThrowsWhenTodayOrLate();
+
+                endDate = startDate;
+                startDate = startDate.plusDays(1);
+            }
+        }
+    }
+
+    void assertThrowsWhenTodayOrLate() {
+        assertThatThrownBy(() -> sut.registerDayOff(mockDto))
+                .isInstanceOf(DayOffHistoryException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVERTED_DAY_OFF_RANGE);
     }
 }

@@ -14,5 +14,4 @@ public class DutyModification {
 
     private final Long employeeId;
     private final LocalDate date;
-    private final String reason;
 }

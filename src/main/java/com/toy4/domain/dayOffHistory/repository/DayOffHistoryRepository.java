@@ -22,7 +22,8 @@ public interface DayOffHistoryRepository extends JpaRepository<DayOffHistory, Lo
         "AND s.status = :status")
     List<DayOffHistory> findByEmployeeIdAndStatus(Long employeeId, RequestStatus status);
 
-    List<DayOffHistory> findAll();
+    List<DayOffHistory> findAllByStatusNot(RequestStatus status);
+
     Optional<DayOffHistory> findById(Long id);
 
     @Query("SELECT s FROM DayOffHistory  s " +

@@ -21,7 +21,7 @@ public interface DutyHistoryRepository extends JpaRepository<DutyHistory, Long> 
         "AND s.status = :status")
     List<DutyHistory> findByEmployeeIdAndStatus(Long employeeId, RequestStatus status);
 
-    List<DutyHistory> findAll();
+    List<DutyHistory> findAllByStatusNot(RequestStatus status);
 
     Optional<DutyHistory> findById(Long id);
 
